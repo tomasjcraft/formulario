@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AUNAR | Acceso al sistema</title>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            background: #080c12;
+            font-family: Consolas, monospace;
+            color: white;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .principal {
+            width: 850px;
+            min-height: 480px;
+            display: flex;
+            border: 1px solid #263a36;
+            background: #0e1519;
+            box-shadow: 0 0 40px rgba(0,255,140,0.08);
+        }
+
+        .lateral {
+            width: 42%;
+            background: #101f20;
+            padding: 40px 30px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            border-right: 1px solid #263a36;
+        }
+
+        .logo {
+            color: #00e58b;
+            font-size: 28px;
+            font-weight: bold;
+            letter-spacing: 5px;
+        }
+
+        .lateral h2 {
+            font-size: 30px;
+            line-height: 1.3;
+            color: white;
+        }
+
+        .lateral p {
+            color: #8ba99e;
+            font-size: 13px;
+            line-height: 1.7;
+        }
+
+        .estado {
+            color: #00e58b;
+            font-size: 12px;
+            border-top: 1px solid #263a36;
+            padding-top: 15px;
+        }
+
+        .formulario {
+            width: 58%;
+            padding: 55px 45px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .etiqueta {
+            color: #00e58b;
+            font-size: 11px;
+            letter-spacing: 3px;
+            margin-bottom: 12px;
+        }
+
+        h1 {
+            font-size: 27px;
+            margin: 0 0 10px;
+        }
+
+        .subtitulo {
+            color: #71817d;
+            font-size: 13px;
+            margin-bottom: 35px;
+        }
+
+        label {
+            display: block;
+            color: #a5b9b1;
+            font-size: 12px;
+            margin-bottom: 9px;
+        }
+
+        input {
+            width: 100%;
+            background: #080f12;
+            border: 1px solid #344941;
+            padding: 14px;
+            color: #00e58b;
+            font-family: Consolas, monospace;
+            font-size: 14px;
+            margin-bottom: 24px;
+            outline: none;
+        }
+
+        input:focus {
+            border-color: #00e58b;
+            box-shadow: 0 0 10px rgba(0,229,139,0.1);
+        }
+
+        button {
+            width: 100%;
+            padding: 15px;
+            background: #00e58b;
+            border: none;
+            color: #07130e;
+            font-family: Consolas, monospace;
+            font-weight: bold;
+            font-size: 14px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        button:hover {
+            background: #8affc9;
+            box-shadow: 0 0 20px rgba(0,229,139,0.2);
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        #mensaje {
+            font-size: 12px;
+            min-height: 18px;
+            margin-top: 20px;
+        }
+
+        .pie {
+            color: #465a53;
+            font-size: 10px;
+            margin-top: 35px;
+        }
+
+        @media (max-width: 650px) {
+            .principal {
+                flex-direction: column;
+            }
+
+            .lateral, .formulario {
+                width: 100%;
+            }
+
+            .lateral {
+                min-height: 190px;
+                padding: 25px;
+            }
+
+            .lateral h2 {
+                font-size: 22px;
+                margin-bottom: 5px;
+            }
+
+            .formulario {
+                padding: 35px 25px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="principal">
+
+        <div class="lateral">
+
+            <div class="logo">AUNAR.</div>
+
+            <div>
+                <h2>Acceso al sistema institucional.</h2>
+
+                <p>
+                    Plataforma de identificación y acceso
+                    para usuarios autorizados.
+                </p>
+            </div>
+
+            <div class="estado">
+                ● SISTEMA DISPONIBLE
+            </div>
+
+        </div>
+
+
+        <div class="formulario">
+
+            <div class="etiqueta">IDENTIFICACIÓN // 001</div>
+
+            <h1>Iniciar sesión</h1>
+
+            <p class="subtitulo">
+                Introduce tus credenciales para continuar.
+            </p>
+
+            <form id="loginForm">
+
+                <label for="usuario">NOMBRE DE USUARIO</label>
+
+                <input
+                    type="text"
+                    id="usuario"
+                    placeholder="usuario..."
+                    required
+                >
+
+                <label for="password">CONTRASEÑA</label>
+
+                <input
+                    type="password"
+                    id="password"
+                    placeholder="********"
+                    required
+                >
+
+                <button type="submit" id="boton">
+                    [ ACCEDER AL SISTEMA ]
+                </button>
+
+            </form>
+
+            <p id="mensaje"></p>
+
+            <div class="pie">
+                AUNAR SYSTEM // PORTAL DE ACCESO
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <script>
+
+        // CONEXION SUPABASE
+
+        const SUPABASE_URL = "https://hypxybgvxvpwfqflijty.supabase.co";
+
+        const SUPABASE_KEY = "sb_publishable_x6A2XiGzM9F2Qlk9xwBUvA_UK3HoJJz";
+
+        const sb = supabase.createClient(
+            SUPABASE_URL,
+            SUPABASE_KEY
+        );
+
+
+        // VALIDACION DE USUARIO
+
+        document.getElementById("loginForm").addEventListener("submit", async function(event) {
+
+            event.preventDefault();
+
+            const usuario = document.getElementById("usuario").value;
+            const password = document.getElementById("password").value;
+
+            const mensaje = document.getElementById("mensaje");
+            const boton = document.getElementById("boton");
+
+            boton.disabled = true;
+            boton.textContent = "[ VERIFICANDO... ]";
+
+            mensaje.style.color = "#00e58b";
+            mensaje.textContent = "Consultando base de datos...";
+
+            try {
+
+                const { data, error } = await sb.functions.invoke(
+                    "login-aunar",
+                    {
+                        body: {
+                            usuario: usuario,
+                            password: password
+                        }
+                    }
+                );
+
+                if (error) {
+
+                    mensaje.style.color = "#ff5252";
+                    mensaje.textContent = "ERROR: Usuario invalido";
+
+                    console.log(error);
+
+                    return;
+                }
+
+                console.log(data);
+
+                if (data && data.success === true) {
+
+                    mensaje.style.color = "#00e58b";
+                    mensaje.textContent = "Acceso autorizado.";
+
+                    window.location.href = "bienvenida.html";
+
+                } else {
+
+                    mensaje.style.color = "#ff5252";
+                    mensaje.textContent = "ERROR: Usuario invalido";
+
+                }
+
+            } catch (error) {
+
+                mensaje.style.color = "#ff5252";
+                mensaje.textContent = "ERROR: No se pudo conectar.";
+
+                console.log(error);
+
+            } finally {
+
+                boton.disabled = false;
+                boton.textContent = "[ ACCEDER AL SISTEMA ]";
+
+            }
+
+        });
+
+    </script>
+
+</body>
+</html>
